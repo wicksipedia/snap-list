@@ -1,68 +1,69 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import ItemInput from './ItemInput';
+import DisplayItems from './DisplayItems';
 import './App.css';
 
 function App() {
 
-  const [Name, setNames] = useState('');
   const [items, setItems] = useState([]);
+
   const [startedSnapping, setStartedSnapping] = useState(false);
   const [canSnap, setCanSnap] = useState(false);
+  
+ const [, updateState] = useState();
+ const forceUpdate = useCallback(() => updateState({}), []);
 
   const handleNamesChange = event => {
-    setNames(event.target.value);
-    const items = Name.split('\n');
-    setItems(items);
+    setItems(event);
     setCanSnap(items.length > 1);
   };
 
   const snapClicked = () => {
     setStartedSnapping(true);
     const snapped = theSnap(items);
-    setNames(snapped.join('\n'));
+    setItems(snapped);
     setCanSnap(items.length > 1);
+    forceUpdate();
   };
 
   const theSnap = items => {
     const numberToSnap = Math.floor(items.length / 2);
-    for (let i = 0; i < numberToSnap; i++) {
-      items.splice(generateRandomInteger(0, items.length), 1);
-    }
+    
+    shuffle(items);
+    items.splice(0, numberToSnap);
+
     return items;
   };
 
-  const generateRandomInteger = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+  const shuffle = (array) => {
+    let currentIndex = array.length,  randomIndex;
+  
+    // While there remain elements to shuffle.
+    while (currentIndex !== 0) {
+  
+      // Pick a remaining element.
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+  }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {!startedSnapping && (
-          <>
-            <p>
-              Enter the list and *snap* 🫰 away
-            </p>
-
-            <div>
-              <textarea
-                id="Name"
-                name="Name"
-                value={Name}
-                onChange={handleNamesChange}
-              />
-            </div>
-          </>
-        )}
-        {canSnap && (
-          <div>
-            <button onClick={snapClicked}>
-              🫰
-            </button>
-          </div>
-        )}
-
+    <div class="app">
+      <ItemInput visible={!startedSnapping} onChange={handleNamesChange} />
+      {canSnap && (
         <div>
-          <pre>{Name}</pre>
-        </div>
-      </header>
+          <Button onClick={snapClicked}>
+            🫰
+          </Button>
+        </div >
+      )}
+      <DisplayItems visible={startedSnapping} items={items}/>
     </div>
   );
 }
