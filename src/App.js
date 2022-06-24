@@ -3,18 +3,23 @@ import './App.css';
 
 function App() {
 
-  const [message, setMessage] = useState('');
+  const [Name, setNames] = useState('');
+  const [items, setItems] = useState([]);
+  const [startedSnapping, setStartedSnapping] = useState(false);
   const [canSnap, setCanSnap] = useState(false);
 
-  const handleMessageChange = event => {
-    setMessage(event.target.value);
-    setCanSnap(message.split('\n').length > 1);
+  const handleNamesChange = event => {
+    setNames(event.target.value);
+    const items = Name.split('\n');
+    setItems(items);
+    setCanSnap(items.length > 1);
   };
 
   const snapClicked = () => {
-    const items = message.split('\n');
+    setStartedSnapping(true);
     const snapped = theSnap(items);
-    setMessage(snapped.join('\n'));
+    setNames(snapped.join('\n'));
+    setCanSnap(items.length > 1);
   };
 
   const theSnap = items => {
@@ -30,19 +35,22 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <p>
-          Enter the list and *snap* 🫰 away
-        </p>
+        {!startedSnapping && (
+          <>
+            <p>
+              Enter the list and *snap* 🫰 away
+            </p>
 
-        <div>
-          <textarea
-            id="message"
-            name="message"
-            value={message}
-            onChange={handleMessageChange}
-          />
-        </div>
-
+            <div>
+              <textarea
+                id="Name"
+                name="Name"
+                value={Name}
+                onChange={handleNamesChange}
+              />
+            </div>
+          </>
+        )}
         {canSnap && (
           <div>
             <button onClick={snapClicked}>
@@ -52,7 +60,7 @@ function App() {
         )}
 
         <div>
-          <p>{message}</p>
+          <pre>{Name}</pre>
         </div>
       </header>
     </div>
